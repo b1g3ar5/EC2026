@@ -1,0 +1,92 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.39.6.
+--
+-- see: https://github.com/sol/hpack
+
+name:               EC2026
+version:            0.1.0.0
+synopsis:           n
+homepage:           n
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Nick Straw
+maintainer:         nick@broxholme.com
+build-type:         Simple
+extra-doc-files:
+    CHANGELOG.md
+
+library
+    exposed-modules:
+        Day1
+        Day10
+        Day11
+        Day12
+        Day13
+        Day14
+        Day15
+        Day16
+        Day17
+        Day18
+        Day2
+        Day3
+        Day4
+        Day5
+        Day6
+        Day7
+        Day8
+        Day9
+        Grid
+        MyLib
+        Queue
+        Utils
+    other-modules:
+        Paths_EC2026
+    autogen-modules:
+        Paths_EC2026
+    build-depends:
+        adjunctions,
+        array,
+        base >=4.20.2.0 && <5,
+        comonad,
+        containers,
+        distributive,
+        fingertree,
+        hashable,
+        pqueue,
+        split,
+        timeit,
+        vector
+    hs-source-dirs:
+        src
+    ghc-options: -Wall -O2
+    default-language: Haskell2010
+
+executable EC2026
+    main-is: Main.hs
+    other-modules:
+        Paths_EC2026
+    autogen-modules:
+        Paths_EC2026
+    build-depends:
+        EC2026,
+        base >=4.20.2.0 && <5
+    hs-source-dirs:
+        app
+    ghc-options: -Wall -O2
+    default-language: Haskell2010
+
+test-suite EC2026-test
+    default-language: Haskell2010
+    type: exitcode-stdio-1.0
+    hs-source-dirs:
+        test
+    ghc-options: -Wall -O2
+    main-is: Main.hs
+    other-modules:
+        Paths_EC2026
+    autogen-modules:
+        Paths_EC2026
+    build-depends:
+        EC2026,
+        base >=4.20.2.0 && <5

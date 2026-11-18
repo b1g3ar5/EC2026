@@ -1,0 +1,44 @@
+name: EC2026
+version: 0.1.0.0
+synopsis: "n"
+author: Nick Straw
+maintainer: nick@broxholme.com
+license: BSD-3-Clause
+license-file: LICENSE
+homepage: "n"
+extra-doc-files:
+  - CHANGELOG.md
+
+ghc-options: -Wall -O2
+
+dependencies:
+  - base >=4.20.2.0 && <5
+
+library:
+  source-dirs: src
+  dependencies:
+    - split
+    - timeit
+    - containers
+    - hashable
+    - vector
+    - comonad
+    - adjunctions
+    - distributive
+    - array
+    - pqueue
+    - fingertree
+
+executables:
+  EC2026:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - EC2026
+
+tests:
+  EC2026-test:
+    main: Main.hs
+    source-dirs: test
+    dependencies:
+      - EC2026

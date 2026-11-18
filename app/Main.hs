@@ -1,0 +1,7 @@
+module Main (main) where
+
+import qualified MyLib (someFunc)
+
+main :: IO ()
+main = do
+  MyLib.someFunc
