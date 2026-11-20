@@ -18,6 +18,7 @@ import Day15
 import Day16
 import Day17
 import Day18
+import Day19
 
 import System.TimeIt
 
@@ -41,5 +42,6 @@ someFunc = do
   day15
   day16
   day17
-  -}
   day18
+  -}
+  day19

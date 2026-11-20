@@ -51,19 +51,20 @@ makeKey mp = height 0 [0..(maximum $ M.keys mp)]
         rt = maximum $ (mp `lu`) <$> xs
 
 
--- This looks neat now but a lot of errors on the way...
+-- This looks neat now ...
 makeKey3 :: M.Map Int (Int, Int) -> Int
 makeKey3 mp = area stats
   where
     hs = map fst (M.elems mp)  
     
-    -- The input with max height to left and right
-    -- The max at x includes the y at x
+    -- The input with max height to left and right including the current height.
+    -- Took me a while to work out this was what scanl is for.
     stats :: [((Int, (Int, Int)), Int, Int)]
     stats = zip3 (M.toList mp) (scanl1 max hs) (scanr1 max hs)
     
     area [] = 0
     area [((_, (_, w)), lt, rt)] = min lt rt * w
+    -- rt1 for the w columns, rt2 for the gap columns
     area (((x1, (_, w1)), lt1, rt1) : rest@(((x2, _), _, rt2) : _)) =
       min lt1 rt1 * w1 + min lt1 rt2 * (x2 - x1 - w1) + area rest
 
