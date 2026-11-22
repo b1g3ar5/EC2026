@@ -93,12 +93,15 @@ distanceMatrix p sc = U.array ((0,0),(p-1,p-1)) $ concatMap (\(i,arr) -> (\(j,v)
     ds = (\i -> (i, shortestPaths rg i)) <$> [0..(p-1)]
 
 
+min3 :: Ord a => [a] -> a
+min3 [a,b,c] = min a $ min b c
+
 addEdge :: Int -> UArray (Int,Int) Int -> (Int,Int) -> UArray (Int,Int) Int
 addEdge n d (a,b) = U.listArray ((0,0),(n-1,n-1))
-  [minimum [ d U.! (i,j)
-           , d U.! (i,a) + 1 + d U.! (b,j)
-           , d U.! (i,b) + 1 + d U.! (a,j)
-           ] | i <- [0..n-1], j <- [0..n-1]]
+      [min3 [ d U.! (i,j)
+        , d U.! (i,a) + 1 + d U.! (b,j)
+        , d U.! (i,b) + 1 + d U.! (a,j)
+      ] | i <- [0..n-1], j <- [0..n-1]]
 
 
 -- pairings for the crystal paths
@@ -125,7 +128,6 @@ day11 :: IO ()
 day11 = do
   putStrLn $ "Quest11: part1: " ++ show ( resonance makeRing1 portals1 shortCuts1)
   putStrLn $ "Quest11: part2: " ++ show ( bestResonance2 portals2 shortCuts2)
-  --putStrLn $ "Quest11: part1: " ++ show ( bestResonance testPortals testShortCuts)
   putStrLn $ "Quest11: part3: " ++ show (largestResonance portals3 shortCuts3)
   return ()
 

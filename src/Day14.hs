@@ -93,7 +93,7 @@ day14 = do
       emp22 = mkMap2 emp21
       
       emp3 = mkMap2 $ mkEdgeMap mp3
-      pairs = [(a,b) | a <- M.keys mp3, b <- M.keys mp3, a /= ' ', b /= ' ', a /= b]
+      pairs = [(a,b) | a <- M.keys mp3, b <- M.keys mp3, a /= ' ', b /= ' ', a < b]
       pbinding = (minBinding3 emp3) <$> pairs
 
   putStrLn $ "Quest14: part1: " ++ show (sum (M.elems (mkEdgeMap mp1)) `div` 2)

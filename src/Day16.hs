@@ -8,7 +8,6 @@ module Day16(day16) where
 import Utils
 import Data.Sequence (Seq)
 import qualified Data.Sequence as S
-import qualified Data.Foldable as F
 import qualified Data.Vector.Unboxed as V
 
 
@@ -49,8 +48,6 @@ join x y
 
 
 -- Don't do any reversing just alternate ends ...
--- Blocks alternate non-c / c; gap j is block 2j. Blocks are kept as boundary
--- indices into one unboxed vector rather than as lists (10M chars of lists = GC hell).
 count :: V.Vector Char -> Int
 count v
   | V.null v = 0

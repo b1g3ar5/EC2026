@@ -23,26 +23,27 @@ import Day20
 
 import System.TimeIt
 
-someFunc :: IO ()
-someFunc = do
+someFunc = timeIt $ timedFunc
 
-  day1
-  day2
-  day3
-  day4
-  day5
-  day6
-  day7
-  day8
-  day9
-  day10
+timedFunc :: IO ()
+timedFunc = do  
+  --day1
+  --day2
+  --day3
+  --day4
+  --day5
+  --day6
+  --day7
+  --day8
+  --day9
+  --day10
   day11
-  day12
-  day13
+  --day12
+  --day13
   day14
-  day15
-  day16
-  day17
-  day18
-  day19
-  day20
+  --day15
+  --day16
+  --day17
+  --day18
+  --day19
+  --day20
