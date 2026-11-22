@@ -19,12 +19,13 @@ import Day16
 import Day17
 import Day18
 import Day19
+import Day20
 
 import System.TimeIt
 
 someFunc :: IO ()
 someFunc = do
-  {-
+
   day1
   day2
   day3
@@ -43,5 +44,5 @@ someFunc = do
   day16
   day17
   day18
-  -}
   day19
+  day20

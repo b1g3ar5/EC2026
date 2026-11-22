@@ -9,6 +9,7 @@ import Utils
 import Data.Sequence (Seq)
 import qualified Data.Sequence as S
 import qualified Data.Foldable as F
+import qualified Data.Vector.Unboxed as V
 
 
 parse :: String -> Seq (Char, Int)
@@ -48,25 +49,26 @@ join x y
 
 
 -- Don't do any reversing just alternate ends ...
-count :: Seq Char -> Int
-count = go . F.toList
+-- Blocks alternate non-c / c; gap j is block 2j. Blocks are kept as boundary
+-- indices into one unboxed vector rather than as lists (10M chars of lists = GC hell).
+count :: V.Vector Char -> Int
+count v
+  | V.null v = 0
+  | otherwise = cost + count newRest
   where
-    go [] = 0
-    go (c : rest) = cost + go newRest
-      where
-        blocks = groupBy ((==) `on` (== c)) (dropWhile (== c) rest)
-        m = length blocks `div` 2
-        (body, end) = splitAt (2 * m) blocks
-        cost = sum (zipWith3 (\b x y -> length b * min x y) body [1 ..] [2 * m, 2 * m - 1 .. 1])
-        gaps = evens body
-        newRest = concat (reverse (take m (interleave (map reverse gaps) (reverse gaps))))
-              ++ concat end
-
-    evens (x : _ : xs) = x : evens xs
-    evens _ = []
-
-    interleave (x : xs) ys = x : interleave ys xs
-    interleave [] ys = ys
+    c = V.head v
+    rest = V.dropWhile (== c) (V.tail v)
+    n = V.length rest
+    isC i = rest V.! i == c
+    bnd = V.concat [V.singleton 0, V.filter (\i -> isC i /= isC (i - 1)) (V.enumFromTo 1 (n - 1)), V.singleton n]
+    m = (V.length bnd - 1) `div` 2
+    block k = V.slice (bnd V.! k) (bnd V.! (k + 1) - bnd V.! k) rest
+    cost = sum [V.length (block k) * min (k + 1) (2 * m - k) | k <- [0 .. 2 * m - 1]]
+    -- i-th element of interleave (map reverse gaps) (reverse gaps)
+    piece i
+      | even i = V.reverse (block i)
+      | otherwise = block (2 * m - 1 - i)
+    newRest = V.concatMap piece (V.enumFromStepN (m - 1) (-1) m) V.++ V.drop (bnd V.! (2 * m)) rest
 
 
 day16 :: IO ()
@@ -76,8 +78,8 @@ day16 = do
   s3 <- getLines (16, 3)
 
   let tablets1 = parse $ head s1
-      tablets2 = S.fromList $ concat $ replicate 10 $ head s2
-      tablets3 = S.fromList $ concat $ replicate 100 $ head s3
+      tablets2 = V.fromList $ concat $ replicate 10 $ head s2
+      tablets3 = V.concat $ replicate 100 $ V.fromList $ head s3
 
   putStrLn $ "Quest16: part1: " ++ show (snd $ sort1 $ tablets1)
   putStrLn $ "Quest16: part2: " ++ show (count tablets2)

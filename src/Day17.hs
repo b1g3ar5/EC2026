@@ -2,25 +2,39 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ExplicitForAll #-}
+{-# LANGUAGE TupleSections #-}
 
 module Day17(day17) where
 
-import Utils
+import Utils hiding (bfs)
 import Data.Set (Set)
 import qualified Data.Set as S
+import Data.Sequence (Seq)
+import qualified Data.Sequence as Q
 import qualified Data.PQueue.Prio.Min as PQ
 import qualified Data.Map as M
 
 
 findPath :: Set Coord -> Int
-findPath cs = (dijkstra pipeline visited nextFn costFn finishFn) M.! finish 
+findPath cs = bfs nextFn (0,0) (==finish)
   where
     finish = S.findMax cs
-    pipeline = PQ.singleton 0 (0,0)
-    visited = M.empty 
     nextFn s = filter (\n -> n `S.member` cs) $ neighbours4 s
-    costFn _ _ = 1
-    finishFn = (==finish)
+
+
+bfs :: forall a. Ord a => (a -> [a]) -> a -> (a -> Bool) -> Int
+bfs next start finish = go (S.singleton start) (Q.singleton (0,start))
+  where
+    --go :: Set a -> Seq (Int, a) -> Int
+    go !seen = \case
+                  Q.Empty -> error "No path"
+                  (n,x) Q.:<| newq
+                    | finish x -> n
+                    | otherwise -> go (foldr S.insert seen ns) (newq Q.>< Q.fromList ((n+1,) <$> ns))
+                    where
+                      ns = filter (`S.notMember` seen) (next x)  
 
 
 count3 :: Set Coord -> Int
@@ -47,20 +61,12 @@ day17 = do
   s2 <- getLines (17, 2)
   s3 <- getLines (17, 3)
   let grid1 = S.fromList $ fst <$> filter snd (parseGridWith (=='#') s1)
-      grid2 = fst <$> filter snd (parseGridWith (=='#') s2)
+      grid2 = S.fromList $ fst <$> filter snd (parseGridWith (=='#') s2)
       grid3 = S.fromList $ fst <$> filter snd (parseGridWith (=='#') s3)
-      sides = (\c -> 4 - length (filter (`elem` grid2) $ neighbours4 c)) <$> grid2
+      sides = (\c -> 4 - length (filter (`S.member` grid2) $ neighbours4 c)) <$> (S.toList grid2)
 
   putStrLn $ "Quest17: part1: " ++ show (findPath grid1)
   putStrLn $ "Quest17: part2: " ++ show (sum sides)
   putStrLn $ "Quest17: part3: " ++ show (count3 grid3)
   return ()
 
-
-
-test1 = ["####.######"
-  , "#.#.##..#.."
-  , "##.##.##..#"
-  , "#.#.###.###"
-  , "#.###.###.#"
-  , "###.##.#.##"]

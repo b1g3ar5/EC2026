@@ -11,13 +11,12 @@ import Data.List (permutations)
 import Data.Bits
 
 
--- After the initial table (see below)
---            0   1   2   3   4   5   6   7
+-- A ring with 8 elements, commutative, zero = K
+-- Fits the addition table given in the problem
 data Colour = W | C | M | B | Y | G | R | K deriving (Eq, Show, Ord, Read, Enum, Bounded)
+--            0   1   2   3   4   5   6   7
 
-
--- I've seen this somewhere before 
--- Convert to and from bits to add
+-- Convert to and from bits, <> == or/union
 instance Semigroup Colour where
   (<>) :: Colour -> Colour -> Colour
   a <> b = toEnum (fromEnum a .|. fromEnum b)
@@ -27,22 +26,20 @@ instance Monoid Colour where
   mempty = W
 
 
-parse :: [String] -> ([Colour], [Colour])
-parse ls = (read . (:[]) <$> (concat $ cs!!0), read . (:[]) <$> (concat $ cs!!1))
+parse1 :: [String] -> ([Colour], [Colour])
+parse1 ls = (read . (:[]) <$> (concat $ cs!!0), read . (:[]) <$> (concat $ cs!!1))
   where
     cs = splitOn "" ls
 
-parse' :: [String] -> ([Colour], [Char])
-parse' ls = (read . (:[]) <$> (concat $ cs!!0), concat $ cs!!1)
+parse2 :: [String] -> ([Colour], [Char])
+parse2 ls = (read . (:[]) <$> (concat $ cs!!0), concat $ cs!!1)
   where
     cs = splitOn "" ls
 
 
 findBest :: [Colour] -> [Char] -> Int
-findBest w c = maximum ns
+findBest w c = maximum $ product . frequencies . apply <$> ps
   where
-    ns :: [Int]
-    ns = product . stat1 . apply <$> ps
     ci :: [Int]
     ci = read . (:[]) <$> c
     ps = permutations [C, M, Y, K]
@@ -50,9 +47,9 @@ findBest w c = maximum ns
     apply p = zipWith (\a i -> a <> (p !! (i-1))) w ci
 
 
-
-stat1 :: (Eq a, Ord a) => [a] -> [Int]
-stat1 = take 3 . sortOn Down . (length <$>) <$> group . sort 
+-- Top 3 colours
+frequencies :: (Eq a, Ord a) => [a] -> [Int]
+frequencies = take 3 . sortOn Down . (length <$>) <$> group . sort 
 
 
 day19 :: IO ()
@@ -61,21 +58,28 @@ day19 = do
   s2 <- getLines (19, 2)
   s3 <- getLines (19, 3)
 
-  let cs1 = parse s1
-      cs2 = parse' s2
-      cs3 = fst $ parse' s3
+  let cs1 = parse1 s1
+      cs2 = parse2 s2
+      cs3 = fst $ parse2 s3
       window1 = zipWith (<>) (fst cs1) (snd cs1)
-      best = findBest (fst cs2) (snd cs2)
+      bestWindow2 = findBest (fst cs2) (snd cs2)
 
-      -- It must be possoble to make the resulting colours equal amounts
-      -- This maximises the product
-      availablePanes = sum $ stat1 cs3
-      (eachColour, r) = availablePanes `quotRem` 3
+      -- It must be possible to make the resulting colours equal amounts
+      -- so that we maximise the product
+      availablePanes = sum $ frequencies cs3
+      (q, r) = availablePanes `quotRem` 3
+      bestWindow3 = product cols
+        where
+          cols
+            | r==0 = [q,q,q]
+            | r==1 = [q+1,q,q]
+            | r==2 = [q+1,q+1,q]
+            | otherwise = error "This is not possible"
 
 
-  putStrLn $ "Quest19: part1: " ++ show (product $ stat1 window1)
-  putStrLn $ "Quest19: part2: " ++ show (best)
-  putStrLn $ "Quest19: part3: " ++ show (eachColour * (eachColour+1) * (eachColour+1))
+  putStrLn $ "Quest19: part1: " ++ show (product $ frequencies window1)
+  putStrLn $ "Quest19: part2: " ++ show (bestWindow2)
+  putStrLn $ "Quest19: part3: " ++ show (bestWindow3)
   return ()
 
 
